@@ -190,6 +190,12 @@ class ScrollablePositionedList extends StatefulWidget {
   State<StatefulWidget> createState() => _ScrollablePositionedListState();
 }
 
+enum Scrolling {
+  ScrollUp,
+  ScrollDown,
+  ScrollStop,
+}
+
 /// Controller to jump or scroll to a particular position in a
 /// [ScrollablePositionedList].
 class ItemScrollController {
@@ -198,7 +204,28 @@ class ItemScrollController {
   /// If `false`, then [jumpTo] and [scrollTo] must not be called.
   bool get isAttached => _scrollableListState != null;
 
+  double previousOffsetPosition = 0;
+
   _ScrollablePositionedListState? _scrollableListState;
+
+  _ScrollablePositionedListState get scrollableListState =>
+      _scrollableListState!;
+
+  Scrolling get scrolling {
+    if (_scrollableListState!.previousOffset > previousOffsetPosition) {
+      // print(
+      //     'Scrolling down ${_scrollableListState!.previousOffset} | $previousOffsetPosition');
+      previousOffsetPosition = _scrollableListState!.previousOffset;
+      return Scrolling.ScrollDown;
+    } else if (_scrollableListState!.previousOffset == previousOffsetPosition) {
+      return Scrolling.ScrollStop;
+    } else {
+      previousOffsetPosition = _scrollableListState!.previousOffset;
+      // print(
+      //     'Scrolling up ${_scrollableListState!.previousOffset} | $previousOffsetPosition');
+      return Scrolling.ScrollUp;
+    }
+  }
 
   /// Immediately, without animation, reconfigure the list so that the item at
   /// [index]'s leading edge is at the given [alignment].
